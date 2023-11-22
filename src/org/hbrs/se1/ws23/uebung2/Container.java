@@ -1,8 +1,23 @@
 package org.hbrs.se1.ws23.uebung2;
 import org.hbrs.se1.ws23.uebung2.Member;
-import java.util.ArrayList;
-public class Container {
+import org.hbrs.se1.ws23.uebung2.Member;
+import org.hbrs.se1.ws23.uebung3.PersistenceException;
+import org.hbrs.se1.ws23.uebung3.PersistenceStrategy;
+
+import java.util.*;
+
+public final class Container {
     public ArrayList<Member> memberListe=new ArrayList();
+    private static Container container=null;
+    private Container(){};
+    private PersistenceStrategy persistenceStrategyContainer;
+    public static Container getInstance(){
+        if(container==null){
+            container=new Container();
+
+        }
+        return container;
+    }
 
 
     public void addMember(Member member) throws ContainerException {
@@ -14,6 +29,7 @@ public class Container {
         }
     }
     public String deleteMember(Integer ID){
+        //Ohne eine Exception muss ich den rueckgabewewert ueberpruefen um fehler auszuschliessen.
         for(Member o:memberListe){
             if(o.getID()==ID){
                 memberListe.remove(o);
@@ -30,4 +46,17 @@ public class Container {
     public int size(){
         return memberListe.size();
     }
+    public List<Member> getCurrentList(){
+        return memberListe;
+    }
+    public void setStrategy(PersistenceStrategy persistenceStrategy){
+        this.persistenceStrategyContainer=persistenceStrategy;
+    }
+    public void store()throws PersistenceException{
+        persistenceStrategyContainer.save(memberListe);
+    }
+    public void load()throws PersistenceException{
+        memberListe= (ArrayList<Member>) persistenceStrategyContainer.load();
+    }
+
 }
